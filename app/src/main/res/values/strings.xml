@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">RepoTracker</string>
+    <string name="search">Search</string>
+    <string name="set_user">Set User</string>
+    <string name="reset">Reset</string>
+    <string name="query">
+        Enter a query, then click Search
+    </string>
+    <string name="search_info">
+        Click search and your URL will show up here!
+    </string>
+    <string name="empty_search">
+        No query entered, nothing to search for.
+    </string>
+    <string name="error_message">
+        Failed to get results. Please try again.
+    </string>
+    <string name="search_default">
+        Make a search!
+    </string>
+    <string name="user_input">
+        Fill with your GitHub username
+    </string>
+    <string name="save">Save</string>
+</resources>

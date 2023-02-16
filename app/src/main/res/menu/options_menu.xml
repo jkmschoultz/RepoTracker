@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/set_user"
+        android:icon="@drawable/ic_menu_help"
+        android:title="@string/set_user" />
+
+    <item
+        android:id="@+id/reset"
+        android:icon="@drawable/ic_menu_help"
+        android:title="@string/reset"/>
+</menu>
+
+
