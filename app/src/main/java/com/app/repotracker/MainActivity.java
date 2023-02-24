@@ -1,5 +1,6 @@
 package com.app.repotracker;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.loader.app.LoaderManager;
@@ -141,8 +142,7 @@ public class MainActivity extends AppCompatActivity implements
                 // Make URL request and return response
                 try {
                     URL githubUrl = new URL(searchQueryUrlString);
-                    String githubSearchResults = NetworkUtils.getResponseFromHttpUrl(githubUrl);
-                    return githubSearchResults;
+                    return NetworkUtils.getResponseFromHttpUrl(githubUrl);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
