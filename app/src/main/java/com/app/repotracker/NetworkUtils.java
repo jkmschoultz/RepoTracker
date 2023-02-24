@@ -1,4 +1,4 @@
-package com.app.repotracker.utilities;
+package com.app.repotracker;
 
 import android.net.Uri;
 

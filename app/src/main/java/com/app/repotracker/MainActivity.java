@@ -1,6 +1,5 @@
 package com.app.repotracker;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.loader.app.LoaderManager;
@@ -18,14 +17,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.app.repotracker.utilities.NetworkUtils;
 
 import java.io.IOException;
 import java.net.URL;

@@ -21,7 +21,7 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/tv_item_number"
+        android:id="@+id/item_number"
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
         tools:text="#42" />
 
     <TextView
-        android:id="@+id/tv_view_holder_instance"
+        android:id="@+id/view_holder_instance"
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -187,8 +187,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.NumberViewHolder> {
         public NumberViewHolder(View itemView) {
             super(itemView);
 
-            listItemNumberView = (TextView) itemView.findViewById(R.id.tv_item_number);
-            viewHolderIndex = (TextView) itemView.findViewById(R.id.tv_view_holder_instance);
+            listItemNumberView = (TextView) itemView.findViewById(R.id.item_number);
+            viewHolderIndex = (TextView) itemView.findViewById(R.id.view_holder_instance);
             //  Call setOnClickListener on the View passed into the constructor (use 'this' as the OnClickListener)
             itemView.setOnClickListener(this);
         }
