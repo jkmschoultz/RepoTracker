@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/se"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".MainActivity">
@@ -17,7 +16,7 @@
         tools:context="com.example.android.asynctaskloader.MainActivity">
 
         <EditText
-            android:id="@+id/et_search_box"
+            android:id="@+id/search_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/query"
@@ -31,7 +30,7 @@
             android:text="@string/search" />
 
         <TextView
-            android:id="@+id/tv_url_display"
+            android:id="@+id/url"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -48,7 +47,7 @@
                 android:layout_marginTop="16dp">
 
                 <TextView
-                    android:id="@+id/tv_github_search_results_json"
+                    android:id="@+id/searchResults"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/search_default"
@@ -56,7 +55,7 @@
             </ScrollView>
 
             <TextView
-                android:id="@+id/tv_error_message_display"
+                android:id="@+id/error_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
@@ -65,7 +64,7 @@
                 android:visibility="invisible" />
 
             <ProgressBar
-                android:id="@+id/pb_loading_indicator"
+                android:id="@+id/loading_symbol"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_gravity="center"
