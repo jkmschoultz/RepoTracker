@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements
     private TextView searchResults;
     private TextView errorMessage;
     private ProgressBar loadingSymbol;
-    private Button searchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements
         searchResults = findViewById(R.id.searchResults);
         errorMessage = findViewById(R.id.error_message);
         loadingSymbol = findViewById(R.id.loading_symbol);
-        searchButton = findViewById(R.id.search);
+        Button searchButton = findViewById(R.id.search);
 
         if (savedInstanceState != null) {
             String queryUrl = savedInstanceState.getString(SEARCH_QUERY_URL_EXTRA);
