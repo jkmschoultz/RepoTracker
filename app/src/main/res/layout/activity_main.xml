@@ -15,20 +15,6 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         tools:context="com.example.android.asynctaskloader.MainActivity">
 
-        <EditText
-            android:id="@+id/search_box"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/query"
-            android:inputType="text"
-            android:textSize="22sp" />
-
-        <Button
-            android:id="@+id/search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/search" />
-
         <TextView
             android:id="@+id/url"
             android:layout_width="wrap_content"

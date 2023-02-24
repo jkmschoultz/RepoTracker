@@ -7,7 +7,7 @@
         Enter a query, then click Search
     </string>
     <string name="search_info">
-        Click search and your URL will show up here!
+        Search for GitHub repositories!
     </string>
     <string name="empty_search">
         No query entered, nothing to search for.

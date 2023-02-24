@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.app.repotracker.utilities.NetworkUtils;
@@ -31,36 +32,26 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String SEARCH_QUERY_URL_EXTRA = "query";
     private static final int GITHUB_SEARCH_LOADER = 22;
-    private EditText searchBox;
     private TextView url;
     private TextView searchResults;
     private TextView errorMessage;
     private ProgressBar loadingSymbol;
+    private SearchView search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        searchBox = findViewById(R.id.search_box);
-        url = findViewById(R.id.url);
-        searchResults = findViewById(R.id.searchResults);
-        errorMessage = findViewById(R.id.error_message);
-        loadingSymbol = findViewById(R.id.loading_symbol);
-        Button searchButton = findViewById(R.id.search);
+        url = (TextView) findViewById(R.id.url);
+        searchResults = (TextView) findViewById(R.id.searchResults);
+        errorMessage = (TextView) findViewById(R.id.error_message);
+        loadingSymbol = (ProgressBar) findViewById(R.id.loading_symbol);
 
         if (savedInstanceState != null) {
             String queryUrl = savedInstanceState.getString(SEARCH_QUERY_URL_EXTRA);
             url.setText(queryUrl);
         }
-
-        // Add listener to search button
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Perform action on click
-                makeGithubSearchQuery();
-            }
-        });
 
         // Initialize loader
         LoaderManager.getInstance(this).initLoader(GITHUB_SEARCH_LOADER, null, this);
@@ -70,7 +61,8 @@ public class MainActivity extends AppCompatActivity implements
      * Make a search on github from the text in the searchBox through an AsyncTaskLoader.
      */
     private void makeGithubSearchQuery() {
-        String githubQuery = searchBox.getText().toString();
+        String githubQuery = search.getQuery().toString();
+        System.out.println(githubQuery);
 
         // If search is empty, display empty search message
         if (TextUtils.isEmpty(githubQuery)) {
@@ -174,6 +166,23 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
+
+        search = (SearchView) menu.findItem(R.id.search).getActionView();
+        // Add listener to search button
+        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                // Perform action on click
+                makeGithubSearchQuery();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -181,6 +190,8 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+            case R.id.search:
+
             case R.id.set_user:
                 // Change to Set User Activity
                 Context context = MainActivity.this;
