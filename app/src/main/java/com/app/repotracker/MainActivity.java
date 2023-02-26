@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-        URL githubSearchUrl = Network.buildUrl(githubQuery);
+        URL githubSearchUrl = Network.buildUrl("/repositories", githubQuery);
         url.setText(githubSearchUrl.toString());
 
         // Save search URL to bundle

@@ -12,21 +12,21 @@ import java.util.Scanner;
 public class Network {
 
     final static String GITHUB_BASE_URL =
-            "https://api.github.com/search/repositories";
+            "https://api.github.com/search";
     final static String PARAM_QUERY = "q";
-    final static String PARAM_SORT = "sort";
-    final static String sortBy = "stars";
+    final static String PARAM_NUM_RESULTS = "per_page";
 
     /**
      * Builds URL from base URL, query parameter and sort parameter.
      *
+     * @param path The path to query API in
      * @param githubSearchQuery The search query to add to the URL
-     * @return Constructed URL
+     * @return Created URL
      */
-    public static URL buildUrl(String githubSearchQuery) {
-        Uri builtUri = Uri.parse(GITHUB_BASE_URL).buildUpon()
+    public static URL buildUrl(String path, String githubSearchQuery) {
+        Uri builtUri = Uri.parse(GITHUB_BASE_URL + path).buildUpon()
                 .appendQueryParameter(PARAM_QUERY, githubSearchQuery)
-                .appendQueryParameter(PARAM_SORT, sortBy)
+                .appendQueryParameter(PARAM_NUM_RESULTS, "100")
                 .build();
 
         URL url = null;
