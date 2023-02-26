@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,6 +22,12 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.app.repotracker.utilities.Adapter;
+import com.app.repotracker.utilities.Network;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,44 +43,23 @@ public class MainActivity extends AppCompatActivity implements
     private ProgressBar loadingSymbol;
     private SearchView search;
 
-    private static final int NUM_LIST_ITEMS = 5;
-
-    /*
-     * References to RecyclerView and Adapter to reset the list to its
-     * "pretty" state when the reset menu item is clicked.
-     */
-    private Adapter adapter;
     private RecyclerView recyclerView;
-    // Create a Toast variable called mToast to store the current Toast
-    /*
-     * If we hold a reference to our Toast, we can cancel it (if it's showing)
-     * to display a new Toast. If we didn't do this, Toasts would be delayed
-     * in showing up if you clicked many list items in quick succession.
-     */
+    private Adapter adapter;
     private Toast mToast;
+    private static final int NUM_LIST_ITEMS = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        url = (TextView) findViewById(R.id.url);
-        searchResults = (TextView) findViewById(R.id.searchResults);
         errorMessage = (TextView) findViewById(R.id.error_message);
         loadingSymbol = (ProgressBar) findViewById(R.id.loading_symbol);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        url = (TextView) findViewById(R.id.url);
+        searchResults = (TextView) findViewById(R.id.searchResults);
 
-        /*
-         * A LinearLayoutManager is responsible for measuring and positioning item views within a
-         * RecyclerView into a linear list. This means that it can produce either a horizontal or
-         * vertical list depending on which parameter you pass in to the LinearLayoutManager
-         * constructor. By default, if you don't specify an orientation, you get a vertical list.
-         * In our case, we want a vertical list, so we don't need to pass in an orientation flag to
-         * the LinearLayoutManager constructor.
-         *
-         * There are other LayoutManagers available to display your data in uniform grids,
-         * staggered grids, and more! See the developer documentation for more details.
-         */
+        // Set layout of recycler view to be vertical list
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
@@ -81,13 +67,7 @@ public class MainActivity extends AppCompatActivity implements
          * Use this setting to improve performance if you know that changes in content do not
          * change the child layout size in the RecyclerView
          */
-        recyclerView.setHasFixedSize(true);
-        //  Pass in this as the ListItemClickListener to the GreenAdapter constructor
-        /*
-         * The GreenAdapter is responsible for displaying each item in the list.
-         */
-        adapter = new Adapter(NUM_LIST_ITEMS, this);
-        recyclerView.setAdapter(adapter);
+        recyclerView.setHasFixedSize(true); //TODO
 
         if (savedInstanceState != null) {
             String queryUrl = savedInstanceState.getString(SEARCH_QUERY_URL_EXTRA);
@@ -98,10 +78,57 @@ public class MainActivity extends AppCompatActivity implements
         LoaderManager.getInstance(this).initLoader(GITHUB_SEARCH_LOADER, null, this);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+
+        search = (SearchView) menu.findItem(R.id.search).getActionView();
+        // Add listener to search button
+        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                // Perform action on click
+                searchGithubRepos();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.search:
+
+            case R.id.set_user:
+                // Change to Set User Activity
+                Context context = MainActivity.this;
+                Class activity = SetUserActivity.class;
+                Intent intent = new Intent(context, activity);
+                startActivity(intent);
+                return true;
+
+            case R.id.reset:
+                // Pass in this as the ListItemClickListener to the GreenAdapter constructor
+                adapter = new Adapter(NUM_LIST_ITEMS, this, null);
+                recyclerView.setAdapter(adapter);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
      * Make a search on github from the text in the searchBox through an AsyncTaskLoader.
      */
-    private void makeGithubSearchQuery() {
+    private void searchGithubRepos() {
         String githubQuery = search.getQuery().toString();
 
         // If search is empty, display empty search message
@@ -110,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-        URL githubSearchUrl = NetworkUtils.buildUrl(githubQuery);
+        URL githubSearchUrl = Network.buildUrl(githubQuery);
         url.setText(githubSearchUrl.toString());
 
         // Save search URL to bundle
@@ -132,14 +159,14 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void showResult() {
         errorMessage.setVisibility(View.INVISIBLE);
-        searchResults.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
     }
 
     /**
      * Make error message visible (and hide search results if visible)
      */
     private void showError() {
-        searchResults.setVisibility(View.INVISIBLE);
+        recyclerView.setVisibility(View.INVISIBLE);
         errorMessage.setVisibility(View.VISIBLE);
     }
 
@@ -173,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements
                 // Make URL request and return response
                 try {
                     URL githubUrl = new URL(searchQueryUrlString);
-                    return NetworkUtils.getResponseFromHttpUrl(githubUrl);
+                    return Network.getResponseFromHttpUrl(githubUrl);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
@@ -192,8 +219,20 @@ public class MainActivity extends AppCompatActivity implements
         if (data == null) {
             showError();
         } else {
-            searchResults.setText(data);
-            showResult();
+            try {
+                JSONObject dataJson = new JSONObject(data);
+                searchResults.setText(data);
+                int numItems = dataJson.getJSONArray("items").length();
+                Log.d("test", dataJson.getJSONArray("items").toString());
+
+                // Adapter for displaying items in recycler view
+                adapter = new Adapter(numItems, this, dataJson);
+                recyclerView.setAdapter(adapter);
+                showResult();
+            } catch (JSONException e) {
+                showError();
+                Log.d("JSON Error", e.toString());
+            }
         }
     }
 
@@ -203,74 +242,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
-
-        search = (SearchView) menu.findItem(R.id.search).getActionView();
-        // Add listener to search button
-        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                // Perform action on click
-                makeGithubSearchQuery();
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.search:
-
-            case R.id.set_user:
-                // Change to Set User Activity
-                Context context = MainActivity.this;
-                Class activity = SetUserActivity.class;
-                Intent intent = new Intent(context, activity);
-                startActivity(intent);
-                return true;
-
-            case R.id.reset:
-                // Pass in this as the ListItemClickListener to the GreenAdapter constructor
-                adapter = new Adapter(NUM_LIST_ITEMS, this);
-                recyclerView.setAdapter(adapter);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onListItemClick(int clickedItemIndex) {
-        // In the beginning of the method, cancel the Toast if it isn't null
-        /*
-         * Even if a Toast isn't showing, it's okay to cancel it. Doing so
-         * ensures that our new Toast will show immediately, rather than
-         * being delayed while other pending Toasts are shown.
-         *
-         * Comment out these three lines, run the app, and click on a bunch of
-         * different items if you're not sure what I'm talking about.
-         */
+        // Cancel any existing toast
         if (mToast != null) {
             mToast.cancel();
         }
 
-        // Show a Toast when an item is clicked, displaying that item number that was clicked
-        /*
-         * Create a Toast and store it in our Toast field.
-         * The Toast that shows up will have a message similar to the following:
-         *
-         *                     Item #42 clicked.
-         */
+        // Display toast when a list item has been pressed
         String toastMessage = "Item #" + clickedItemIndex + " clicked.";
         mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
 

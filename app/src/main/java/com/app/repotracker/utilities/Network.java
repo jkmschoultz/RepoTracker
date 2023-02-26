@@ -1,4 +1,4 @@
-package com.app.repotracker;
+package com.app.repotracker.utilities;
 
 import android.net.Uri;
 
@@ -9,7 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-public class NetworkUtils {
+public class Network {
 
     final static String GITHUB_BASE_URL =
             "https://api.github.com/search/repositories";
