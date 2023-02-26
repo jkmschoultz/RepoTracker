@@ -12,35 +12,22 @@
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="16dp">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            tools:context="com.example.android.asynctaskloader.MainActivity">
+            android:layout_height="wrap_content">
 
-            <FrameLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="invisible">
-
-                </androidx.recyclerview.widget.RecyclerView>
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/error_message"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/info"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="@string/error_message"
-                    android:textSize="22sp"
-                    android:visibility="invisible" />
+                    android:text="@string/search_info"
+                    android:textSize="22sp" />
 
                 <ProgressBar
                     android:id="@+id/loading_symbol"
@@ -48,27 +35,17 @@
                     android:layout_height="42dp"
                     android:layout_gravity="center"
                     android:visibility="invisible" />
+            </LinearLayout>
 
-            </FrameLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible">
 
-            <TextView
-                android:id="@+id/url"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/search_info"
-                android:textSize="22sp"
-                android:visibility="gone" />
+            </androidx.recyclerview.widget.RecyclerView>
 
-            <TextView
-                android:id="@+id/searchResults"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search_default"
-                android:textSize="18sp"
-                android:visibility="gone" />
-
-        </LinearLayout>
+        </FrameLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -35,11 +35,11 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<String>, Adapter.ListItemClickListener {
 
-    private static final String SEARCH_QUERY_URL_EXTRA = "query";
+    private static final String SEARCH_QUERY_KEY = "urlQuery";
+    private static final String COMPLETE_URL_KEY = "completeUrl";
     private static final int GITHUB_SEARCH_LOADER = 22;
-    private TextView url;
-    private TextView searchResults;
-    private TextView errorMessage;
+    private String searchQuery;
+    private TextView infoMessage;
     private ProgressBar loadingSymbol;
     private SearchView search;
 
@@ -53,11 +53,9 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        errorMessage = (TextView) findViewById(R.id.error_message);
+        infoMessage = (TextView) findViewById(R.id.info);
         loadingSymbol = (ProgressBar) findViewById(R.id.loading_symbol);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        url = (TextView) findViewById(R.id.url);
-        searchResults = (TextView) findViewById(R.id.searchResults);
 
         // Set layout of recycler view to be vertical list
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -70,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements
         recyclerView.setHasFixedSize(true); //TODO
 
         if (savedInstanceState != null) {
-            String queryUrl = savedInstanceState.getString(SEARCH_QUERY_URL_EXTRA);
-            url.setText(queryUrl);
+            String query = savedInstanceState.getString(SEARCH_QUERY_KEY);
+            searchGithubRepos(query);
         }
 
         // Initialize loader
@@ -89,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public boolean onQueryTextSubmit(String s) {
                 // Perform action on click
-                searchGithubRepos();
+                searchGithubRepos(s);
                 return true;
             }
 
@@ -118,8 +116,8 @@ public class MainActivity extends AppCompatActivity implements
 
             case R.id.reset:
                 // Pass in this as the ListItemClickListener to the GreenAdapter constructor
-                adapter = new Adapter(NUM_LIST_ITEMS, this, null);
-                recyclerView.setAdapter(adapter);
+                recyclerView.setVisibility(View.INVISIBLE);
+                infoMessage.setVisibility(View.VISIBLE);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -128,21 +126,19 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Make a search on github from the text in the searchBox through an AsyncTaskLoader.
      */
-    private void searchGithubRepos() {
-        String githubQuery = search.getQuery().toString();
-
+    private void searchGithubRepos(String query) {
         // If search is empty, display empty search message
-        if (TextUtils.isEmpty(githubQuery)) {
-            url.setText(R.string.empty_search);
+        if (TextUtils.isEmpty(query)) {
+            infoMessage.setText(R.string.empty_search);
             return;
         }
 
-        URL githubSearchUrl = Network.buildUrl("/repositories", githubQuery);
-        url.setText(githubSearchUrl.toString());
+        searchQuery = query;
+        URL githubSearchUrl = Network.buildUrl("/repositories", query);
 
         // Save search URL to bundle
         Bundle bundle = new Bundle();
-        bundle.putString(SEARCH_QUERY_URL_EXTRA, githubSearchUrl.toString());
+        bundle.putString(COMPLETE_URL_KEY, githubSearchUrl.toString());
 
         // Get existing loader or create new loader from loader manager
         LoaderManager loaderManager = LoaderManager.getInstance(this);
@@ -158,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements
      * Make search results visible (hides error message if visible)
      */
     private void showResult() {
-        errorMessage.setVisibility(View.INVISIBLE);
+        infoMessage.setVisibility(View.INVISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
     }
 
@@ -167,7 +163,17 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void showError() {
         recyclerView.setVisibility(View.INVISIBLE);
-        errorMessage.setVisibility(View.VISIBLE);
+        infoMessage.setText(R.string.error_message);
+        infoMessage.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Make empty result message visible (and hide search results if visible)
+     */
+    private void showEmpty() {
+        recyclerView.setVisibility(View.INVISIBLE);
+        infoMessage.setText(R.string.error_empty);
+        infoMessage.setVisibility(View.VISIBLE);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -191,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements
             public String loadInBackground() {
 
                 // Get URL to search from bundle as string
-                String searchQueryUrlString = args.getString(SEARCH_QUERY_URL_EXTRA);
+                String searchQueryUrlString = args.getString(COMPLETE_URL_KEY);
 
                 if (searchQueryUrlString == null || TextUtils.isEmpty(searchQueryUrlString)) {
                     return null;
@@ -212,27 +218,39 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
 
-        // Hide loading symbol
+        // Hide loading symbol and info message
         loadingSymbol.setVisibility(View.INVISIBLE);
 
         // Show error message if no data, or show results
         if (data == null) {
             showError();
         } else {
-            try {
-                JSONObject dataJson = new JSONObject(data);
-                searchResults.setText(data);
-                int numItems = dataJson.getJSONArray("items").length();
-                Log.d("test", dataJson.getJSONArray("items").toString());
+            loadData(data);
+        }
+    }
 
+    /**
+     * Parse received data into json and load data into RecyclerView
+     *
+     * @param data The data to parse into RecyclerView
+     */
+    public void loadData(String data) {
+        try {
+            JSONObject dataJson = new JSONObject(data);
+            int numItems = dataJson.getJSONArray("items").length();
+
+            if (numItems < 1) {
+                showEmpty();
+            }
+            else {
                 // Adapter for displaying items in recycler view
                 adapter = new Adapter(numItems, this, dataJson);
                 recyclerView.setAdapter(adapter);
                 showResult();
-            } catch (JSONException e) {
-                showError();
-                Log.d("JSON Error", e.toString());
             }
+        } catch (JSONException e) {
+            showError();
+            Log.d("JSONError", e.toString());
         }
     }
 
@@ -258,9 +276,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        // Save search URL
-        String queryUrl = url.getText().toString();
-        outState.putString(SEARCH_QUERY_URL_EXTRA, queryUrl);
+        // Save json data
+        outState.putString(SEARCH_QUERY_KEY, searchQuery);
 
     }
 }

@@ -3,9 +3,6 @@
     <string name="search">Search</string>
     <string name="set_user">Set User</string>
     <string name="reset">Reset</string>
-    <string name="query">
-        Enter a query, then click Search
-    </string>
     <string name="search_info">
         Search for GitHub repositories!
     </string>
@@ -15,8 +12,8 @@
     <string name="error_message">
         Failed to get results. Please try again.
     </string>
-    <string name="search_default">
-        Make a search!
+    <string name="error_empty">
+        No results found. Please try again.
     </string>
     <string name="user_input">
         Fill with your GitHub username
