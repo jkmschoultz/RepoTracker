@@ -1,6 +1,7 @@
 package com.app.repotracker.utilities;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,8 +62,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         View view = inflater.inflate(layoutIdForListItem, viewGroup, false);
         ViewHolder viewHolder = new ViewHolder(view);
 
-        viewHolder.viewHolderIndex.setText("ViewHolder index: " + viewHolderCount);
-
         viewHolderCount++;
         Log.d(TAG, "onCreateViewHolder: number of ViewHolders created: "
                 + viewHolderCount);
@@ -84,7 +83,11 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             String owner = item.getJSONObject("owner").getString("login");
             int issues = item.getInt("open_issues_count");
             int forks = item.getInt("forks");
-            holder.bind(position, name, owner, issues, forks);
+            holder.bind(name, owner, issues, forks);
+
+            if (position % 2 == 1) {
+                holder.itemView.setBackgroundColor(Color.LTGRAY);
+            }
 
         } catch (JSONException e) {
             Log.d("JSONError", e.toString());
@@ -107,12 +110,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     class ViewHolder extends RecyclerView.ViewHolder
             implements OnClickListener {
 
-        TextView position;
         TextView repoName;
         TextView repoOwner;
         TextView repoIssues;
         TextView forks;
-        TextView viewHolderIndex;
 
         /**
          * Create ViewHolder from an inflated View.
@@ -122,12 +123,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         public ViewHolder(View itemView) {
             super(itemView);
 
-            position = (TextView) itemView.findViewById(R.id.item_number);
             repoName = (TextView) itemView.findViewById(R.id.repo_name);
             repoOwner = (TextView) itemView.findViewById(R.id.repo_owner);
             repoIssues = (TextView) itemView.findViewById(R.id.repo_issues);
             forks = (TextView) itemView.findViewById(R.id.forks);
-            viewHolderIndex = (TextView) itemView.findViewById(R.id.view_holder_instance);
             //  Call setOnClickListener on the View passed into the constructor (use 'this' as the OnClickListener)
             itemView.setOnClickListener(this);
         }
@@ -135,18 +134,20 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         /**
          * Binds data to ViewHolder.
          *
-         * @param listPosition Position of item in list
          * @param name Name of repository
          * @param owner Owner of repository
          * @param issues Number of open issues in repository
          * @param forks Number of forks in repository
          */
-        void bind(int listPosition, String name, String owner, int issues, int forks) {
-            position.setText(String.valueOf(listPosition));
-            repoName.setText(String.valueOf(name));
-            repoOwner.setText(String.valueOf(owner));
-            this.repoIssues.setText(String.valueOf(issues));
-            this.forks.setText(String.valueOf(forks));
+        void bind(String name, String owner, int issues, int forks) {
+            String repo = "Repository: " + name;
+            String by = "Owner: " + owner;
+            String numIssues = "Issues: " + issues;
+            String numForks = "Forks: " + forks;
+            repoName.setText(repo);
+            repoOwner.setText(by);
+            this.repoIssues.setText(numIssues);
+            this.forks.setText(numForks);
         }
 
         /**

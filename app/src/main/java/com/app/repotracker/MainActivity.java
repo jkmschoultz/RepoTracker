@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -45,13 +46,24 @@ public class MainActivity extends AppCompatActivity implements
 
     private RecyclerView recyclerView;
     private Adapter adapter;
-    private Toast mToast;
-    private static final int NUM_LIST_ITEMS = 10;
+    private Toast toast;
+    private SharedPreferences sharedPreferences;
+    private final String PREFERENCES = "Preferences";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Check if first time launching app
+        sharedPreferences = getSharedPreferences(PREFERENCES, 0);
+        if (sharedPreferences == null || !sharedPreferences.contains("username")) {
+            // object and key found, show all saved values
+            Context context = MainActivity.this;
+            Class activity = SetUserActivity.class;
+            Intent intent = new Intent(context, activity);
+            startActivity(intent);
+        }
 
         infoMessage = (TextView) findViewById(R.id.info);
         loadingSymbol = (ProgressBar) findViewById(R.id.loading_symbol);
@@ -118,6 +130,9 @@ public class MainActivity extends AppCompatActivity implements
                 // Pass in this as the ListItemClickListener to the GreenAdapter constructor
                 recyclerView.setVisibility(View.INVISIBLE);
                 infoMessage.setVisibility(View.VISIBLE);
+                SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+                sharedPreferencesEditor.clear();
+                sharedPreferencesEditor.apply();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -262,15 +277,15 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onListItemClick(int clickedItemIndex) {
         // Cancel any existing toast
-        if (mToast != null) {
-            mToast.cancel();
+        if (toast != null) {
+            toast.cancel();
         }
 
         // Display toast when a list item has been pressed
         String toastMessage = "Item #" + clickedItemIndex + " clicked.";
-        mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
+        toast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
 
-        mToast.show();
+        toast.show();
     }
 
     @Override

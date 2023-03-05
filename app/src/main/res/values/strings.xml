@@ -18,5 +18,8 @@
     <string name="user_input">
         Fill with your GitHub username
     </string>
+    <string name="user_info">
+        Please enter your GitHub username below:
+    </string>
     <string name="save">Save</string>
 </resources>

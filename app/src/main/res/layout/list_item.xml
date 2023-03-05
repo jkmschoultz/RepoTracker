@@ -8,59 +8,47 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="3">
 
         <TextView
-            android:id="@+id/item_number"
-            style="@style/TextAppearance.AppCompat.Title"
-            android:layout_width="wrap_content"
+            android:id="@+id/repo_name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|start"
-            android:fontFamily="monospace"
-            android:textSize="12sp"
-            tools:text="#42" />
+            android:layout_gravity="start|center_vertical"
+            android:layout_weight="1"
+            android:text="Repository: " />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="center_vertical|end"
+            android:layout_weight="2"
             android:orientation="vertical"
             android:padding="8dp">
-
-            <TextView
-                android:id="@+id/repo_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Repository: " />
 
             <TextView
                 android:id="@+id/repo_owner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:text="Owner: " />
 
             <TextView
                 android:id="@+id/repo_issues"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:text="Issues: " />
 
             <TextView
                 android:id="@+id/forks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:text="Forks: " />
+
         </LinearLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/view_holder_instance"
-        style="@style/TextAppearance.AppCompat.Title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
-        android:fontFamily="monospace"
-        android:textColor="#000"
-        android:textSize="12sp"
-        tools:text="ViewHolder instance: 7" />
 </FrameLayout>
