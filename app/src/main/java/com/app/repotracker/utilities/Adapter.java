@@ -1,7 +1,9 @@
 package com.app.repotracker.utilities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +58,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
-        int layoutIdForListItem = R.layout.search_list_item;
+        int layoutIdForListItem = R.layout.list_item;
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(layoutIdForListItem, viewGroup, false);
@@ -83,7 +85,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             String owner = item.getJSONObject("owner").getString("login");
             int issues = item.getInt("open_issues_count");
             int forks = item.getInt("forks");
-            holder.bind(name, owner, issues, forks);
+            String url = item.getString("html_url");
+            holder.bind(name, owner, issues, forks, url);
 
             // Set background colour to alternate
             switch(position % 2) {
@@ -119,6 +122,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         TextView repoOwner;
         TextView repoIssues;
         TextView forks;
+        String url;
 
         /**
          * Create ViewHolder from an inflated View.
@@ -143,8 +147,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
          * @param owner Owner of repository
          * @param issues Number of open issues in repository
          * @param forks Number of forks in repository
+         * @param url The url link to the repository
          */
-        void bind(String name, String owner, int issues, int forks) {
+        void bind(String name, String owner, int issues, int forks, String url) {
             String repo = "Repository: " + name;
             String by = "Owner: " + owner;
             String numIssues = "Issues: " + issues;
@@ -153,6 +158,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             repoOwner.setText(by);
             this.repoIssues.setText(numIssues);
             this.forks.setText(numForks);
+            this.url = url;
         }
 
         /**
@@ -164,6 +170,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
             onClickListener.onListItemClick(clickedPosition);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            v.getContext().startActivity(intent);
         }
     }
 }

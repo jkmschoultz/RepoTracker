@@ -262,16 +262,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        // Cancel any existing toast
-        if (toast != null) {
-            toast.cancel();
-        }
-
-        // Display toast when a list item has been pressed
-        String toastMessage = "Item #" + clickedItemIndex + " clicked.";
-        toast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
-
-        toast.show();
+        // Must be overridden
     }
 
     @Override
