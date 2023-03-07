@@ -11,21 +11,41 @@ import java.util.Scanner;
 
 public class Network {
 
-    final static String GITHUB_BASE_URL =
-            "https://api.github.com/search";
-    final static String PARAM_QUERY = "q";
+    final static String GITHUB_BASE_URL = "https://api.github.com";
     final static String PARAM_NUM_RESULTS = "per_page";
 
     /**
-     * Builds URL from base URL, query parameter and sort parameter.
+     * Builds URL from base URL and query with parameter.
      *
      * @param path The path to query API in
-     * @param githubSearchQuery The search query to add to the URL
+     * @param param The type of the query to append to the URL
+     * @param query The search query to add to the URL
      * @return Created URL
      */
-    public static URL buildUrl(String path, String githubSearchQuery) {
+    public static URL buildUrl(String path, String param, String query) {
         Uri builtUri = Uri.parse(GITHUB_BASE_URL + path).buildUpon()
-                .appendQueryParameter(PARAM_QUERY, githubSearchQuery)
+                .appendQueryParameter(param, query)
+                .appendQueryParameter(PARAM_NUM_RESULTS, "100")
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+    /**
+     * Builds URL from base URL without any query parameters.
+     *
+     * @param path The path to query API in
+     * @return Created URL
+     */
+    public static URL buildUrl(String path) {
+        Uri builtUri = Uri.parse(GITHUB_BASE_URL + path).buildUpon()
                 .appendQueryParameter(PARAM_NUM_RESULTS, "100")
                 .build();
 

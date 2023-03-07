@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">RepoTracker</string>
     <string name="search">Search</string>
+    <string name="home">Home</string>
     <string name="my_repos">My repositories</string>
     <string name="set_user">Set User</string>
     <string name="reset">Reset</string>
@@ -9,6 +10,9 @@
     </string>
     <string name="empty_search">
         No query entered, nothing to search for.
+    </string>
+    <string name="empty_username">
+        Please set your GitHub username to view your own repositories!
     </string>
     <string name="error_message">
         Failed to get results. Please try again.

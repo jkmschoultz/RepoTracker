@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements
     private Adapter adapter;
     private Toast toast;
     private SharedPreferences sharedPreferences;
+    final static String PARAM_QUERY = "q";
     private final String PREFERENCES = "Preferences";
 
     @Override
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Check if first time launching app
+        // If no username is saved to shared preferences, launch Set User activity
         sharedPreferences = getSharedPreferences(PREFERENCES, 0);
         if (sharedPreferences == null || !sharedPreferences.contains("username")) {
             // object and key found, show all saved values
@@ -73,12 +74,7 @@ public class MainActivity extends AppCompatActivity implements
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        /*
-         * Use this setting to improve performance if you know that changes in content do not
-         * change the child layout size in the RecyclerView
-         */
-        recyclerView.setHasFixedSize(true); //TODO
-
+        // Get search made from any saved instance state
         if (savedInstanceState != null) {
             String query = savedInstanceState.getString(SEARCH_QUERY_KEY);
             searchGithubRepos(query);
@@ -94,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements
         inflater.inflate(R.menu.options_menu, menu);
 
         search = (SearchView) menu.findItem(R.id.search).getActionView();
+        search.setVisibility(View.VISIBLE);
         // Add listener to search button
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -117,6 +114,10 @@ public class MainActivity extends AppCompatActivity implements
         Context context = MainActivity.this;
         Intent intent;
         switch (item.getItemId()) {
+            case R.id.home:
+                intent = new Intent(context, MainActivity.class);
+                startActivity(intent);
+                return true;
             case R.id.user_repos:
                 // Change to User Repos Activity
                 intent = new Intent(context, UserReposActivity.class);
@@ -130,12 +131,12 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
 
             case R.id.reset:
-                // Pass in this as the ListItemClickListener to the GreenAdapter constructor
-                recyclerView.setVisibility(View.INVISIBLE);
-                infoMessage.setVisibility(View.VISIBLE);
+                // Clear stored shared preferences and launch Set User Activity
                 SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
                 sharedPreferencesEditor.clear();
                 sharedPreferencesEditor.apply();
+                intent = new Intent(context, SetUserActivity.class);
+                startActivity(intent);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         searchQuery = query;
-        URL githubSearchUrl = Network.buildUrl("/repositories", query);
+        URL githubSearchUrl = Network.buildUrl("/search/repositories", PARAM_QUERY, query);
 
         // Save search URL to bundle
         Bundle bundle = new Bundle();
@@ -166,32 +167,6 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             loaderManager.restartLoader(GITHUB_SEARCH_LOADER, bundle, this);
         }
-    }
-
-    /**
-     * Make search results visible (hides error message if visible)
-     */
-    private void showResult() {
-        infoMessage.setVisibility(View.INVISIBLE);
-        recyclerView.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Make error message visible (and hide search results if visible)
-     */
-    private void showError() {
-        recyclerView.setVisibility(View.INVISIBLE);
-        infoMessage.setText(R.string.error_message);
-        infoMessage.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Make empty result message visible (and hide search results if visible)
-     */
-    private void showEmpty() {
-        recyclerView.setVisibility(View.INVISIBLE);
-        infoMessage.setText(R.string.error_empty);
-        infoMessage.setVisibility(View.VISIBLE);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -241,7 +216,9 @@ public class MainActivity extends AppCompatActivity implements
 
         // Show error message if no data, or show results
         if (data == null) {
-            showError();
+            recyclerView.setVisibility(View.INVISIBLE);
+            infoMessage.setText(R.string.error_message);
+            infoMessage.setVisibility(View.VISIBLE);
         } else {
             loadData(data);
         }
@@ -258,16 +235,22 @@ public class MainActivity extends AppCompatActivity implements
             int numItems = dataJson.getJSONArray("items").length();
 
             if (numItems < 1) {
-                showEmpty();
+                // Display message that result was empty
+                recyclerView.setVisibility(View.INVISIBLE);
+                infoMessage.setText(R.string.error_empty);
+                infoMessage.setVisibility(View.VISIBLE);
             }
             else {
                 // Adapter for displaying items in recycler view
                 adapter = new Adapter(numItems, this, dataJson);
                 recyclerView.setAdapter(adapter);
-                showResult();
+                infoMessage.setVisibility(View.INVISIBLE);
+                recyclerView.setVisibility(View.VISIBLE);
             }
         } catch (JSONException e) {
-            showError();
+            recyclerView.setVisibility(View.INVISIBLE);
+            infoMessage.setText(R.string.error_message);
+            infoMessage.setVisibility(View.VISIBLE);
             Log.d("JSONError", e.toString());
         }
     }
