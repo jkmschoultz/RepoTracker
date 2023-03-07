@@ -56,7 +56,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
-        int layoutIdForListItem = R.layout.list_item;
+        int layoutIdForListItem = R.layout.search_list_item;
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view = inflater.inflate(layoutIdForListItem, viewGroup, false);
@@ -85,8 +85,13 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             int forks = item.getInt("forks");
             holder.bind(name, owner, issues, forks);
 
-            if (position % 2 == 1) {
-                holder.itemView.setBackgroundColor(Color.LTGRAY);
+            // Set background colour to alternate
+            switch(position % 2) {
+                case 0:
+                    holder.itemView.setBackgroundColor(Color.WHITE);
+                    break;
+                case 1:
+                    holder.itemView.setBackgroundColor(Color.LTGRAY);
             }
 
         } catch (JSONException e) {

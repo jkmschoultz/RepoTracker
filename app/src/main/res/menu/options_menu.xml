@@ -5,9 +5,12 @@
     <item
         android:id="@+id/search"
         android:icon="@drawable/search_icon"
-        android:title="Search"
-        app:showAsAction="always"
-        app:actionViewClass="android.widget.SearchView" />
+        android:title="@string/search"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/user_repos"
+        android:title="@string/my_repos" />
     <item
         android:id="@+id/set_user"
         android:icon="@drawable/ic_menu_help"

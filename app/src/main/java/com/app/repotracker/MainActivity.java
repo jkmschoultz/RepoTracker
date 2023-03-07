@@ -114,15 +114,18 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
+        Context context = MainActivity.this;
+        Intent intent;
         switch (item.getItemId()) {
-            case R.id.search:
+            case R.id.user_repos:
+                // Change to User Repos Activity
+                intent = new Intent(context, UserReposActivity.class);
+                startActivity(intent);
+                return true;
 
             case R.id.set_user:
                 // Change to Set User Activity
-                Context context = MainActivity.this;
-                Class activity = SetUserActivity.class;
-                Intent intent = new Intent(context, activity);
+                intent = new Intent(context, SetUserActivity.class);
                 startActivity(intent);
                 return true;
 
