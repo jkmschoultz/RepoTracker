@@ -24,6 +24,8 @@ public class SetUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set layout of activity
         setContentView(R.layout.activity_set_user);
 
         username = (TextView) findViewById(R.id.username_text);
@@ -31,32 +33,37 @@ public class SetUserActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREFERENCES, 0);
         sharedPrefEditor = sharedPreferences.edit();
 
+        // Apply any existing username saved to Shared Preferences
         if (sharedPreferences != null
                 && sharedPreferences.contains("username")) {
-            // object and key found, show all saved values
             applySavedPreferences();
         }
 
+        // Add Listener to Button to save username
         saveUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String input = username.getText().toString();
-                System.out.println(input);
+
+                // Display toast message if input is empty
                 if (TextUtils.isEmpty(input)) {
                     // Cancel any existing toast
                     if (toast != null) {
                         toast.cancel();
                     }
 
-                    // Display toast when a list item has been pressed
                     String toastMessage = "Username field cannot be empty";
                     toast = Toast.makeText(SetUserActivity.this, toastMessage, Toast.LENGTH_SHORT);
                     toast.show();
                     return;
 
                 }
+
+                // Store username in Shared Preferences
                 sharedPrefEditor.putString("username", input);
                 sharedPrefEditor.commit();
+
+                // Redirect to Main Activity
                 Context context = SetUserActivity.this;
                 Class activity = MainActivity.class;
                 Intent intent = new Intent(context, activity);
@@ -66,6 +73,7 @@ public class SetUserActivity extends AppCompatActivity {
     }
 
     public void applySavedPreferences() {
+        // Fill username field with stored Shared Preference
         username.setText(
             sharedPreferences.getString("username", "")
         );

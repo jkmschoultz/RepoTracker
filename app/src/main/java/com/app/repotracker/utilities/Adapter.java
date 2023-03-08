@@ -28,12 +28,12 @@ import java.util.ArrayList;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
-    private static final String TAG = Adapter.class.getSimpleName();
-    final private ListItemClickListener onClickListener;
-    private static int viewHolderCount;
-    private Context context;
     private int numberOfItems;
     private JSONArray data;
+    private Context context;
+    private static int viewHolderCount;
+    private final ListItemClickListener onClickListener;
+    private static final String TAG = Adapter.class.getSimpleName();
 
     /**
      * Interface for receiving message that a list item has been clicked.
@@ -43,8 +43,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     }
 
     /**
-     * Create Adapter with a number of items to list and a listener for clicked items.
+     * Create Adapter with a context, number of items, listener for clicked items, and data.
      *
+     * @param context The context the adapter is created in
      * @param numberOfItems Number of items in list
      * @param listener Listener for list item clicks
      * @param data JSON of data to use
@@ -67,13 +68,16 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
      */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        // Set layout of ViewHolder element
         Context context = viewGroup.getContext();
         int layoutIdForListItem = R.layout.list_item;
         LayoutInflater inflater = LayoutInflater.from(context);
 
+        // Create ViewHolder with inflated View
         View view = inflater.inflate(layoutIdForListItem, viewGroup, false);
         ViewHolder viewHolder = new ViewHolder(view);
 
+        // Track number of ViewHolders created
         viewHolderCount++;
         Log.d(TAG, "onCreateViewHolder: number of ViewHolders created: "
                 + viewHolderCount);
@@ -90,6 +94,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         Log.d(TAG, "#" + position);
         try {
+            // Get required data to bind to holder
             JSONObject item = (JSONObject) data.get(position);
             String name = item.getString("name");
             String owner = item.getJSONObject("owner").getString("login");
@@ -98,8 +103,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             String url = item.getString("html_url");
             holder.bind(name, owner, issues, forks, url);
 
-            // Set background colour to alternate
+            // Check if the app is in dark mode
             int nightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            // Set background colour to alternate for ViewHolders
             switch(position % 2) {
                 case 0:
                     if (nightMode == Configuration.UI_MODE_NIGHT_NO)
@@ -127,6 +133,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
      */
     @Override
     public int getItemCount() {
+        // Must be overridden
         return numberOfItems;
     }
 
@@ -154,7 +161,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             repoOwner = (TextView) itemView.findViewById(R.id.repo_owner);
             repoIssues = (TextView) itemView.findViewById(R.id.repo_issues);
             forks = (TextView) itemView.findViewById(R.id.forks);
-            //  Call setOnClickListener on the View passed into the constructor (use 'this' as the OnClickListener)
+            // Register click listener to View
             itemView.setOnClickListener(this);
         }
 
@@ -172,6 +179,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             String by = "Owner: " + owner;
             String numIssues = "Issues: " + issues;
             String numForks = "Forks: " + forks;
+            // Set ViewHolder to display the relevant information
             repoName.setText(repo);
             repoOwner.setText(by);
             this.repoIssues.setText(numIssues);
@@ -188,6 +196,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
             onClickListener.onListItemClick(clickedPosition);
+            // Launch URL of repository clicked with implicit intent
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(url));
             v.getContext().startActivity(intent);

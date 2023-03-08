@@ -47,6 +47,8 @@ public class BaseActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set layout of activity
         setContentView(R.layout.activity_main);
 
         // If no username is saved to shared preferences, launch Set User activity
@@ -65,12 +67,13 @@ public class BaseActivity extends AppCompatActivity implements
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        // Initialize loader
+        // Initialize background loader
         LoaderManager.getInstance(this).initLoader(GITHUB_SEARCH_LOADER, null, this);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Set layout of options menu
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
         return true;
@@ -78,10 +81,12 @@ public class BaseActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Use explicit intents to launch activities based on options menu choice
         Context context = BaseActivity.this;
         Intent intent;
         switch (item.getItemId()) {
             case R.id.home:
+                // Change to Main Activity
                 intent = new Intent(context, MainActivity.class);
                 startActivity(intent);
                 return true;
@@ -138,7 +143,9 @@ public class BaseActivity extends AppCompatActivity implements
     }
 
     /**
-     * Make a search on github from the text in the searchBox through an AsyncTaskLoader.
+     * Make a search on github from a provided URL through an AsyncTaskLoader.
+     *
+     * @param url The URL to be searched
      */
     public void performSearch(URL url) {
 
@@ -164,7 +171,7 @@ public class BaseActivity extends AppCompatActivity implements
 
             @Override
             protected void onStartLoading() {
-
+                // Do nothing if no args provided
                 if (args == null) {
                     return;
                 }
@@ -179,12 +186,11 @@ public class BaseActivity extends AppCompatActivity implements
 
                 // Get URL to search from bundle as string
                 String searchQueryUrlString = args.getString(COMPLETE_URL_KEY);
-
                 if (searchQueryUrlString == null || TextUtils.isEmpty(searchQueryUrlString)) {
                     return null;
                 }
 
-                // Make URL request and return response
+                // Make HTTP request and return response
                 try {
                     URL githubUrl = new URL(searchQueryUrlString);
                     return Network.getResponseFromHttpUrl(githubUrl);
@@ -203,20 +209,23 @@ public class BaseActivity extends AppCompatActivity implements
      */
     public void loadData(String data) {
         try {
+            // Parse provided string into Json format
             JSONArray dataJson = new JSONObject(data).getJSONArray("items");
             int numItems = dataJson.length();
 
+            // Check if data is empty
             if (numItems < 1) {
                 showEmpty();
             }
             else {
-                // Adapter for displaying items in recycler view
+                // Load data into adapter for displaying items in recycler view
                 adapter = new Adapter(this, numItems, this, dataJson);
                 recyclerView.setAdapter(adapter);
                 infoMessage.setVisibility(View.INVISIBLE);
                 recyclerView.setVisibility(View.VISIBLE);
             }
         } catch (JSONException e) {
+            // Show error message if data could not be parsed properly
             showError();
             Log.d("JSONError", e.toString());
         }
