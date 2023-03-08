@@ -2,6 +2,7 @@ package com.app.repotracker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
 import androidx.loader.content.Loader;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import com.app.repotracker.utilities.Adapter;
 import com.app.repotracker.utilities.Network;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -95,6 +97,15 @@ public class BaseActivity extends AppCompatActivity implements
                 startActivity(intent);
                 return true;
 
+            case R.id.toggle_dark:
+                // Toggle dark mode on or off
+                if (isDarkModeEnabled()) {
+                    disableDarkMode();
+                } else {
+                    enableDarkMode();
+                }
+                return true;
+
             case R.id.reset:
                 // Clear stored shared preferences and launch Set User Activity
                 SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
@@ -106,6 +117,24 @@ public class BaseActivity extends AppCompatActivity implements
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void enableDarkMode() {
+        // Enable dark mode
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        recreate();
+    }
+
+    private void disableDarkMode() {
+        // Disable dark mode
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        recreate();
+    }
+
+    public boolean isDarkModeEnabled() {
+        // Check if dark mode is enabled
+        int nightMode = AppCompatDelegate.getDefaultNightMode();
+        return nightMode == AppCompatDelegate.MODE_NIGHT_YES;
     }
 
     /**
@@ -174,15 +203,15 @@ public class BaseActivity extends AppCompatActivity implements
      */
     public void loadData(String data) {
         try {
-            JSONObject dataJson = new JSONObject(data);
-            int numItems = dataJson.getJSONArray("items").length();
+            JSONArray dataJson = new JSONObject(data).getJSONArray("items");
+            int numItems = dataJson.length();
 
             if (numItems < 1) {
                 showEmpty();
             }
             else {
                 // Adapter for displaying items in recycler view
-                adapter = new Adapter(numItems, this, dataJson);
+                adapter = new Adapter(this, numItems, this, dataJson);
                 recyclerView.setAdapter(adapter);
                 infoMessage.setVisibility(View.INVISIBLE);
                 recyclerView.setVisibility(View.VISIBLE);

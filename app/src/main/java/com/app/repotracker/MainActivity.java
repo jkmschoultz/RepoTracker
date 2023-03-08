@@ -1,5 +1,6 @@
 package com.app.repotracker;
 
+import androidx.annotation.NonNull;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-import com.app.repotracker.utilities.Adapter;
 import com.app.repotracker.utilities.Network;
 
 import java.net.URL;
@@ -22,7 +22,6 @@ public class MainActivity extends BaseActivity {
     private ProgressBar loadingSymbol;
     private RecyclerView recyclerView;
     private String searchQuery;
-    private Adapter adapter;
     final static String PARAM_QUERY = "q";
 
     @Override
@@ -36,7 +35,8 @@ public class MainActivity extends BaseActivity {
         // Get previous search made from any saved instance state
         if (savedInstanceState != null) {
             String query = savedInstanceState.getString(SEARCH_QUERY_KEY);
-            searchGithubRepos(query);
+            if (!TextUtils.isEmpty(query))
+                searchGithubRepos(query);
         }
     }
 
@@ -45,11 +45,14 @@ public class MainActivity extends BaseActivity {
         super.onCreateOptionsMenu(menu);
 
         SearchView search = (SearchView) menu.findItem(R.id.search).getActionView();
+        if (!TextUtils.isEmpty(searchQuery))
+            search.setQuery(searchQuery, false);
         // Add listener to search bar
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 // Search github public repos for user's submitted query
+                search.clearFocus();
                 searchGithubRepos(s);
                 return true;
             }
@@ -95,8 +98,8 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         // Save any search query made
         outState.putString(SEARCH_QUERY_KEY, searchQuery);
-        super.onSaveInstanceState(outState);
     }
 }

@@ -50,7 +50,7 @@ public class SetUserActivity extends AppCompatActivity {
 
                     // Display toast when a list item has been pressed
                     String toastMessage = "Username field cannot be empty";
-                    toast = Toast.makeText(SetUserActivity.this, toastMessage, Toast.LENGTH_LONG);
+                    toast = Toast.makeText(SetUserActivity.this, toastMessage, Toast.LENGTH_SHORT);
                     toast.show();
                     return;
 

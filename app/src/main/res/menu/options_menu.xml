@@ -20,6 +20,9 @@
         android:title="@string/set_user" />
 
     <item
+        android:id="@+id/toggle_dark"
+        android:title="@string/dark_mode" />
+    <item
         android:id="@+id/reset"
         android:icon="@drawable/ic_menu_help"
         android:title="@string/reset"/>

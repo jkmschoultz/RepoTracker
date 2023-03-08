@@ -2,29 +2,38 @@ package com.app.repotracker.utilities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.repotracker.R;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     private static final String TAG = Adapter.class.getSimpleName();
     final private ListItemClickListener onClickListener;
     private static int viewHolderCount;
+    private Context context;
     private int numberOfItems;
-    private JSONObject data;
+    private JSONArray data;
 
     /**
      * Interface for receiving message that a list item has been clicked.
@@ -40,7 +49,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
      * @param listener Listener for list item clicks
      * @param data JSON of data to use
      */
-    public Adapter(int numberOfItems, ListItemClickListener listener, JSONObject data) {
+    public Adapter(Context context, int numberOfItems, ListItemClickListener listener, JSONArray data) {
+        this.context = context;
         this.numberOfItems = numberOfItems;
         this.onClickListener = listener;
         this.data = data;
@@ -80,7 +90,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         Log.d(TAG, "#" + position);
         try {
-            JSONObject item = (JSONObject) data.getJSONArray("items").get(position);
+            JSONObject item = (JSONObject) data.get(position);
             String name = item.getString("name");
             String owner = item.getJSONObject("owner").getString("login");
             int issues = item.getInt("open_issues_count");
@@ -89,12 +99,20 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             holder.bind(name, owner, issues, forks, url);
 
             // Set background colour to alternate
+            int nightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
             switch(position % 2) {
                 case 0:
-                    holder.itemView.setBackgroundColor(Color.WHITE);
+                    if (nightMode == Configuration.UI_MODE_NIGHT_NO)
+                        holder.itemView.setBackgroundColor(Color.WHITE);
+                    else
+                        holder.itemView.setBackgroundColor(Color.BLACK);
                     break;
                 case 1:
-                    holder.itemView.setBackgroundColor(Color.LTGRAY);
+                    if (nightMode == Configuration.UI_MODE_NIGHT_NO)
+                        holder.itemView.setBackgroundColor(Color.LTGRAY);
+                    else
+                        holder.itemView.setBackgroundColor(Color.DKGRAY);
+                    break;
             }
 
         } catch (JSONException e) {

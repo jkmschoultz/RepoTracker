@@ -1,16 +1,16 @@
 package com.app.repotracker;
 
-import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.SearchView;
 import android.widget.TextView;
+
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.repotracker.utilities.Network;
 
@@ -46,21 +46,9 @@ public class UserReposActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        // Add listener to search button
-        SearchView search = (SearchView) menu.findItem(R.id.search).getActionView();
-        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                // Perform action on click
-                // TODO
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
+        // Hide Search View in this activity
+        MenuItem search = (MenuItem) menu.findItem(R.id.search);
+        search.setVisible(false);
 
         return true;
     }
